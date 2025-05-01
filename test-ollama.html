@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Ollama Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Ollama API Connection</h1>
+    <button id="testDirectApi">Test Direct Ollama API</button>
+    <button id="testChatApi">Test Chat API Endpoint</button>
+    <div id="result">Results will appear here...</div>
+
+    <script>
+        document.getElementById('testDirectApi').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Testing direct connection to Ollama API...';
+            
+            try {
+                const response = await fetch('http://localhost:11434/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'phi',
+                        prompt: 'Hello, how are you?',
+                        stream: false
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.textContent = 'Direct Ollama API Response:\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = 'Error testing direct Ollama API:\n' + error.message;
+                console.error('Error testing Ollama API:', error);
+            }
+        });
+        
+        document.getElementById('testChatApi').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Testing chat API endpoint...';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Hello, how are you?'
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Chat API error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                resultDiv.textContent = 'Chat API Response:\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = 'Error testing chat API:\n' + error.message;
+                console.error('Error testing chat API:', error);
+            }
+        });
+    </script>
+</body>
+</html>
